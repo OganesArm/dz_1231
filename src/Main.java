@@ -4,17 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-class Animal {
+abstract class Animal {
     private String name;
-    private String type;
-    private String subType;
     private LocalDate birthDate;
     private List<String> commands;
 
-    public Animal(String name, String type, String subType, LocalDate birthDate) {
+    public Animal(String name, LocalDate birthDate) {
         this.name = name;
-        this.type = type;
-        this.subType = subType;
         this.birthDate = birthDate;
         this.commands = new ArrayList<>();
     }
@@ -27,21 +23,9 @@ class Animal {
         return name;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
+    public abstract String getType();
 
-    public String getType() {
-        return type;
-    }
-
-    public void setSubType(String subType) {
-        this.subType = subType;
-    }
-
-    public String getSubType() {
-        return subType;
-    }
+    public abstract String getSubType();
 
     public LocalDate getBirthDate() {
         return birthDate;
@@ -49,6 +33,94 @@ class Animal {
 
     public List<String> getCommands() {
         return commands;
+    }
+}
+
+abstract class DomesticAnimal extends Animal {
+    public DomesticAnimal(String name, LocalDate birthDate) {
+        super(name, birthDate);
+    }
+
+    @Override
+    public String getType() {
+        return "Домашние";
+    }
+}
+
+abstract class PackAnimal extends Animal {
+    public PackAnimal(String name, LocalDate birthDate) {
+        super(name, birthDate);
+    }
+
+    @Override
+    public String getType() {
+        return "Вьючные";
+    }
+}
+
+class Cat extends DomesticAnimal {
+    public Cat(String name, LocalDate birthDate) {
+        super(name, birthDate);
+    }
+
+    @Override
+    public String getSubType() {
+        return "Кошка";
+    }
+}
+
+class Hamster extends DomesticAnimal {
+    public Hamster(String name, LocalDate birthDate) {
+        super(name, birthDate);
+    }
+
+    @Override
+    public String getSubType() {
+        return "Хомяк";
+    }
+}
+
+class Dog extends DomesticAnimal {
+    public Dog(String name, LocalDate birthDate) {
+        super(name, birthDate);
+    }
+
+    @Override
+    public String getSubType() {
+        return "Собака";
+    }
+}
+
+class Horse extends PackAnimal {
+    public Horse(String name, LocalDate birthDate) {
+        super(name, birthDate);
+    }
+
+    @Override
+    public String getSubType() {
+        return "Лошадь";
+    }
+}
+
+class Camel extends PackAnimal {
+    public Camel(String name, LocalDate birthDate) {
+        super(name, birthDate);
+    }
+
+    @Override
+    public String getSubType() {
+        return "Верблюд";
+    }
+}
+
+class Donkey extends PackAnimal {
+    public Donkey(String name, LocalDate birthDate) {
+        super(name, birthDate);
+    }
+
+    @Override
+    public String getSubType() {
+        return "Осел";
     }
 }
 
@@ -100,46 +172,37 @@ public class Main {
                         System.out.println("2. Вьючные");
                         int typeChoice = scanner.nextInt();
                         scanner.nextLine();
-                        String type;
+                        Animal animal;
                         if (typeChoice == 1) {
-                            type = "Домашние";
-                        } else if (typeChoice == 2) {
-                            type = "Вьючные";
-                        } else {
-                            System.out.println("Неверный выбор. Попробуйте еще раз.");
-                            break;
-                        }
-                        System.out.println("Выберите подтип животного:");
-                        if (type.equals("Домашние")) {
+                            System.out.println("Выберите подтип животного:");
                             System.out.println("1. Кошка");
                             System.out.println("2. Хомяк");
                             System.out.println("3. Собака");
-                        } else if (type.equals("Вьючные")) {
-                            System.out.println("1. Лошадь");
-                            System.out.println("2. Верблюд");
-                            System.out.println("3. Осел");
-                        }
-                        int subTypeChoice = scanner.nextInt();
-                        scanner.nextLine();
-                        String subType;
-                        if (type.equals("Домашние")) {
+                            int subTypeChoice = scanner.nextInt();
+                            scanner.nextLine();
                             if (subTypeChoice == 1) {
-                                subType = "Кошка";
+                                animal = new Cat(name, null);
                             } else if (subTypeChoice == 2) {
-                                subType = "Хомяк";
+                                animal = new Hamster(name, null);
                             } else if (subTypeChoice == 3) {
-                                subType = "Собака";
+                                animal = new Dog(name, null);
                             } else {
                                 System.out.println("Неверный выбор. Попробуйте еще раз.");
                                 break;
                             }
-                        } else if (type.equals("Вьючные")) {
+                        } else if (typeChoice == 2) {
+                            System.out.println("Выберите подтип животного:");
+                            System.out.println("1. Лошадь");
+                            System.out.println("2. Верблюд");
+                            System.out.println("3. Осел");
+                            int subTypeChoice = scanner.nextInt();
+                            scanner.nextLine();
                             if (subTypeChoice == 1) {
-                                subType = "Лошадь";
+                                animal = new Horse(name, null);
                             } else if (subTypeChoice == 2) {
-                                subType = "Верблюд";
+                                animal = new Camel(name, null);
                             } else if (subTypeChoice == 3) {
-                                subType = "Осел";
+                                animal = new Donkey(name, null);
                             } else {
                                 System.out.println("Неверный выбор. Попробуйте еще раз.");
                                 break;
@@ -151,7 +214,8 @@ public class Main {
                         System.out.println("Введите дату рождения животного в формате дд.мм.гггг:");
                         String birthDateString = scanner.nextLine();
                         LocalDate birthDate = LocalDate.parse(birthDateString, dateFormatter);
-                        animals.add(new Animal(name, type, subType, birthDate));
+                        animal = animal.getClass().getConstructor(String.class, LocalDate.class).newInstance(animal.getName(), birthDate);
+                        animals.add(animal);
                         counter.add();
                         System.out.println("Животное добавлено. Количество добавленных животных: " + counter.getCount());
                     } catch (Exception e) {
@@ -168,47 +232,36 @@ public class Main {
                         System.out.println("2. Вьючные");
                         int typeChoice = scanner.nextInt();
                         scanner.nextLine();
-                        String type;
                         if (typeChoice == 1) {
-                            type = "Домашние";
-                        } else if (typeChoice == 2) {
-                            type = "Вьючные";
-                        } else {
-                            System.out.println("Неверный выбор. Попробуйте еще раз.");
-                            break;
-                        }
-                        animal.setType(type);
-                        System.out.println("Выберите новый подтип животного:");
-                        if (type.equals("Домашние")) {
+                            System.out.println("Выберите новый подтип животного:");
                             System.out.println("1. Кошка");
                             System.out.println("2. Хомяк");
                             System.out.println("3. Собака");
-                        } else if (type.equals("Вьючные")) {
-                            System.out.println("1. Лошадь");
-                            System.out.println("2. Верблюд");
-                            System.out.println("3. Осел");
-                        }
-                        int subTypeChoice = scanner.nextInt();
-                        scanner.nextLine();
-                        String subType;
-                        if (type.equals("Домашние")) {
+                            int subTypeChoice = scanner.nextInt();
+                            scanner.nextLine();
                             if (subTypeChoice == 1) {
-                                subType = "Кошка";
+                                animal = new Cat(animal.getName(), animal.getBirthDate());
                             } else if (subTypeChoice == 2) {
-                                subType = "Хомяк";
+                                animal = new Hamster(animal.getName(), animal.getBirthDate());
                             } else if (subTypeChoice == 3) {
-                                subType = "Собака";
+                                animal = new Dog(animal.getName(), animal.getBirthDate());
                             } else {
                                 System.out.println("Неверный выбор. Попробуйте еще раз.");
                                 break;
                             }
-                        } else if (type.equals("Вьючные")) {
+                        } else if (typeChoice == 2) {
+                            System.out.println("Выберите новый подтип животного:");
+                            System.out.println("1. Лошадь");
+                            System.out.println("2. Верблюд");
+                            System.out.println("3. Осел");
+                            int subTypeChoice = scanner.nextInt();
+                            scanner.nextLine();
                             if (subTypeChoice == 1) {
-                                subType = "Лошадь";
+                                animal = new Horse(animal.getName(), animal.getBirthDate());
                             } else if (subTypeChoice == 2) {
-                                subType = "Верблюд";
+                                animal = new Camel(animal.getName(), animal.getBirthDate());
                             } else if (subTypeChoice == 3) {
-                                subType = "Осел";
+                                animal = new Donkey(animal.getName(), animal.getBirthDate());
                             } else {
                                 System.out.println("Неверный выбор. Попробуйте еще раз.");
                                 break;
@@ -217,7 +270,8 @@ public class Main {
                             System.out.println("Неверный выбор. Попробуйте еще раз.");
                             break;
                         }
-                        animal.setSubType(subType);
+                        animals.removeIf(a -> a.getName().equals(name));
+                        animals.add(animal);
                         System.out.println("Тип и подтип животного изменены.");
                     } else {
                         System.out.println("Животное с таким именем не найдено.");
